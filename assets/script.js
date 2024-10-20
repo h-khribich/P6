@@ -31,9 +31,12 @@ let slideIndex = 0;
 bannerImg.src = `./assets/images/slideshow/${slides[0].image}`
 bannerTagLine.innerHTML = slides[0].tagLine
 
+// Slides initialization
 slides.forEach((slide) => {
-  const newDot = document.createElement("span")
+  const newDot = document.createElement("a")
+  newDot.setAttribute("href", "#")
   newDot.classList.add("dot")
+  newDot.classList.add(`index${slides.indexOf(slide)}`)
 
   if(slides.indexOf(slide) === 0) {
     newDot.classList.add("dot_selected")
@@ -41,6 +44,22 @@ slides.forEach((slide) => {
 
   dots.appendChild(newDot);
 })
+
+// Replacing content depending on index for arrows and dots
+const replaceContent = (index) => {
+  bannerImg.src = "";
+  bannerImg.src = `./assets/images/slideshow/${slides[slideIndex].image}`
+
+  bannerTagLine.innerHTML = "";
+  bannerTagLine.innerHTML = slides[slideIndex].tagLine
+
+  // Updating highlight
+  const previousHighlightedDot = dots.querySelector(".dot_selected")
+  previousHighlightedDot.classList.remove("dot_selected")
+
+  const currentHighlightedDot = dots.childNodes.item(index)
+  currentHighlightedDot.classList.add("dot_selected")
+}
 
 // Banner scrolling feature
 arrows.forEach((arrow) => {
@@ -54,18 +73,22 @@ arrows.forEach((arrow) => {
       slideIndex === slides.length - 1 ? slideIndex = 0 : slideIndex++;
     }
 
-    // Replacing content
-    bannerImg.src = "";
-    bannerImg.src = `./assets/images/slideshow/${slides[slideIndex].image}`
+    replaceContent(slideIndex + 1)
+  })
+})
 
-    bannerTagLine.innerHTML = "";
-    bannerTagLine.innerHTML = slides[slideIndex].tagLine
+// Dot navigation feature
+dots.childNodes.forEach((dot) => {
+  dot.addEventListener("click", (e) => {
+    e.preventDefault();
 
-    // Updating dot hightlight according to index
-    const previousHighlightedDot = dots.querySelector(".dot_selected")
-    previousHighlightedDot.classList.remove("dot_selected")
-
-    const currentHighlightedDot = dots.childNodes.item(slideIndex + 1)
-    currentHighlightedDot.classList.add("dot_selected")
+    const clickedEl = (e.target)
+    const indexRef = Array.from(clickedEl.classList).find(cls => cls.includes('index'));
+    const index = Number(indexRef.charAt(indexRef.length - 1));
+    
+    slideIndex = index;
+    
+    // Adding 1 because slideIndex starts at 0
+    replaceContent(index + 1)
   })
 })
